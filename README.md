@@ -1,4 +1,4 @@
-# Solutudo CakePHP Develop
+# Solutudo Laravel Develop
 
 Efetuar a instalação do docker conforme o manual em https://docs.docker.com/installation/ubuntulinux/#installing-docker-on-ubuntu.
 
