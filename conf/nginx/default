@@ -83,11 +83,13 @@ server {
         add_header Cache-Control public;
     }
 
-    location ~ ^/(img|cjs|ccss)/ {
-           access_log off;
-           expires 7d;
-           add_header Cache-Control public;
-    }
+    # Static files.
+    # Set expire headers, Turn off access log
+    #location ~ ^/(img|cjs|ccss)/ {
+    #       access_log off;
+    #       expires 7d;
+    #       add_header Cache-Control public;
+    #}
 
     # deny access to .htaccess files, if Apache's document root
     # concurs with nginx's one
