@@ -1,13 +1,14 @@
 # Pull base image.
-FROM library/ubuntu
+FROM library/ubuntu:14.04
 
 # Author info
-MAINTAINER Adriano Luís Rocha <adriano.rocha@solutudo.com.br>
+MAINTAINER Adriano Luís Rocha <driflash@gmail.com>
 
 # Install software-properties-common to access add-apt-repository and curl
 RUN \
+  apt-get update && \
   apt-get install -y --force-yes software-properties-common \
-                                 wget
+                                 curl
 
 # Install Nginx.
 RUN \
@@ -16,7 +17,8 @@ RUN \
   apt-get install -y nginx && \
   echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
   mkdir -p /var/www/html/app/webroot && \
-  chown -R www-data:www-data /var/www
+  chown -R www-data:www-data /var/www && \
+  sed -i "s/sendfile\s*on;/sendfile off;/" /etc/nginx/nginx.conf
 
 # Install php
 RUN \
@@ -31,6 +33,7 @@ RUN \
                                  php5-mysql \
                                  php5-pgsql \
                                  php5-mcrypt \
+                                 php5-redis \
                                  php5-sqlite \
                                  php5-xdebug && \
   sed -i "s/;daemonize\s*=\s*yes/daemonize = no/" /etc/php5/fpm/php-fpm.conf && \
@@ -46,7 +49,10 @@ RUN \
 
 # Install GeoIP Cities light
 RUN mkdir -pv /usr/share/GeoIP && \
-  wget -O - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz | gunzip -c > /usr/share/GeoIP/GeoIPCity.dat
+  curl http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz | gunzip -c > /usr/share/GeoIP/GeoIPCity.dat
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Define working directory.
 WORKDIR /var/www/html
