@@ -1,11 +1,12 @@
 # Pull base image.
-FROM library/ubuntu
+FROM library/ubuntu:14.04
 
 # Author info
 MAINTAINER Adriano Luís Rocha <driflash@gmail.com>
 
 # Install software-properties-common to access add-apt-repository and curl
 RUN \
+  apt-get update && \
   apt-get install -y --force-yes software-properties-common \
                                  curl
 
