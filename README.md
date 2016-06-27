@@ -13,7 +13,7 @@ Clonar este repositório e na pasta do projeto executar:
 Em seguida configure 1 docker para cada projeto que deseja utilizar:
 
     docker run -p 8070:80 \
-        -v $HOME/Projects/Laravel/public:/var/www/html \
+        -v $HOME/Projects/Laravel:/var/www/html \
         -v $HOME/Projects/Laravel/storage/logs:/var/log/nginx \
         --name laravel \
         adrianoluis/docker-laravel-develop &
