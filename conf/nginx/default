@@ -41,7 +41,7 @@ server {
     location / {
         # First attempt to serve request as file, then
         # as directory, then fall back to index.html
-        try_files $uri $uri/ /index.html /index.php?$query_string;
+        try_files $uri $uri/ /index.php$is_args$args;
         # Uncomment to enable naxsi on this location
         # include /etc/nginx/naxsi.rules
     }
@@ -66,7 +66,7 @@ server {
         fastcgi_buffers 16 16k; 
         fastcgi_buffer_size 32k;
         fastcgi_read_timeout 300; 
-        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
         fastcgi_index index.php;
         fastcgi_intercept_errors on; # to support 404s for PHP files not found
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
