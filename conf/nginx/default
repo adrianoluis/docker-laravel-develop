@@ -41,7 +41,7 @@ server {
     location / {
         # First attempt to serve request as file, then
         # as directory, then fall back to index.html
-        try_files $uri $uri/ /index.html /index.php?$query_string;
+        try_files $uri $uri/ /index.php$is_args$args;
         # Uncomment to enable naxsi on this location
         # include /etc/nginx/naxsi.rules
     }

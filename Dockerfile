@@ -8,36 +8,39 @@ MAINTAINER Adriano Luís Rocha <driflash@gmail.com>
 RUN \
   apt-get update && \
   apt-get install -y software-properties-common \
-                                 curl
+                     curl \
+                     unzip
 
 # Install Nginx.
 RUN \
   apt-get install -y nginx && \
   echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
-  mkdir -p /var/www/html/app/webroot && \
+  mkdir -p /var/www/html/public && \
   chown -R www-data:www-data /var/www && \
   sed -i "s/sendfile\s*on;/sendfile off;/" /etc/nginx/nginx.conf
 
 # Install php
 RUN \
   apt-get install -y php-gd \
-                                 php-cli \
-                                 php-fpm \
-                                 php-curl \
-                                 php-intl \
-                                 php-geoip \
-                                 php-mysql \
-                                 php-pgsql \
-                                 php-mcrypt \
-                                 php-mbstring \
-                                 php-redis \
-                                 php-sqlite3 \
-                                 php-xdebug && \
+                     php-cli \
+                     php-dom \
+                     php-fpm \
+                     php-curl \
+                     php-intl \
+                     php-geoip \
+                     php-mysql \
+                     php-pgsql \
+                     php-mcrypt \
+                     php-mbstring \
+                     php-redis \
+                     php-soap \
+                     php-sqlite3 \
+                     php-xdebug && \
   sed -i "s/;daemonize\s*=\s*yes/daemonize = no/" /etc/php/7.0/fpm/php-fpm.conf && \
-  sed -i "s/;request_terminate_timeout\s*=\s*0/request_terminate_timeout = 300/" /etc/php/7.0/fpm/pool.d/www.conf && \
   sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo = 0/" /etc/php/7.0/fpm/php.ini && \
   sed -i "s/memory_limit\s*=\s*128M/memory_limit = 256M/" /etc/php/7.0/fpm/php.ini && \
   sed -i "s/max_execution_time\s*=\s*30/max_execution_time = 300/" /etc/php/7.0/fpm/php.ini && \
+  sed -i "s/;request_terminate_timeout\s*=\s*0/request_terminate_timeout = 300/" /etc/php/7.0/fpm/php.ini && \
   sed -i "s/error_reporting\s*=\s*E_ALL\s*&\s*~E_DEPRECATED\s*&\s*~E_STRICT/error_reporting = E_ALL/" /etc/php/7.0/fpm/php.ini && \
   sed -i "s/display_errors\s*=\s*Off/display_errors = On/" /etc/php/7.0/fpm/php.ini && \
   sed -i "s/display_startup_errors\s*=\s*Off/display_startup_errors = On/" /etc/php/7.0/fpm/php.ini && \
@@ -56,8 +59,7 @@ WORKDIR /var/www/html
 
 # Configure default site
 ADD conf/nginx/default /etc/nginx/sites-available/default
-RUN mkdir -p /var/www/html/public && \
-    echo "<?php phpinfo() ?>" > /var/www/html/public/index.php
+RUN echo "<?php phpinfo() ?>" > /var/www/html/public/index.php
 
 # Configure Xdebug
 RUN echo "xdebug.remote_enable=on" >> /etc/php/7.0/mods-available/xdebug.ini
