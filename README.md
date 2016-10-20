@@ -20,9 +20,9 @@ Em seguida configure 1 docker para cada projeto que deseja utilizar:
 docker run -p 8000:80 \
     --link mysql:mysql \
     --link redis:redis \
-    -v /Users/adriano/Projects/Liuv/Laravel_Liuv:/var/www/html \
-    -v /Users/adriano/Projects/Liuv/Laravel_Liuv/storage/logs:/var/log/nginx \
-    --name apiliuv \
+    -v $HOME/Projects/Laravel:/var/www/html \
+    -v $HOME/Projects/Laravel/storage/logs:/var/log/nginx \
+    --name laravel \
     adrianoluis/docker-laravel-develop &
 ```
 
