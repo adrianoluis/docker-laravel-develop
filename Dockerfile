@@ -12,16 +12,17 @@ RUN \
                                  curl
 =======
                      curl \
+                     supervisor \
                      unzip
 >>>>>>> 4ef99ae... Fix laravel dependencies for 5.3
 
 # Install Nginx.
 RUN \
   apt-get install -y nginx && \
-  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
   mkdir -p /var/www/html/public && \
-  chown -R www-data:www-data /var/www && \
-  sed -i "s/sendfile\s*on;/sendfile off;/" /etc/nginx/nginx.conf
+  mkdir -p /var/log/supervisor && \
+  sed -i "s/sendfile\s*on;/sendfile off;/" /etc/nginx/nginx.conf && \
+  sed -i "s/user\s*www-data;/user root;/" /etc/nginx/nginx.conf
 
 # Install php
 RUN \
@@ -40,6 +41,12 @@ RUN \
                      php-soap \
                      php-sqlite3 \
                      php-xdebug && \
+  sed -i "s/listen.owner\s*=\s*www-data/listen.owner = root/" /etc/php/7.0/fpm/pool.d/www.conf && \
+  sed -i "s/listen.group\s*=\s*www-data/listen.group = root/" /etc/php/7.0/fpm/pool.d/www.conf && \
+  sed -i "s/listen\s*=\s*\/run\/php\/php7\.0\-fpm\.sock/listen = \/var\/run\/php7\.0\-fpm\.sock/" /etc/php/7.0/fpm/pool.d/www.conf && \
+  sed -i "s/user\s*=\s*www-data/user = root/" /etc/php/7.0/fpm/pool.d/www.conf && \
+  sed -i "s/group\s*=\s*www-data/group = root/" /etc/php/7.0/fpm/pool.d/www.conf && \
+  sed -i "s/pid\s*=\s*\/run\/php\/php7\.0\-fpm\.pid/pid = \/var\/run\/php7\.0\-fpm\.pid/" /etc/php/7.0/fpm/php-fpm.conf && \
   sed -i "s/;daemonize\s*=\s*yes/daemonize = no/" /etc/php/7.0/fpm/php-fpm.conf && \
   sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo = 0/" /etc/php/7.0/fpm/php.ini && \
   sed -i "s/memory_limit\s*=\s*128M/memory_limit = 256M/" /etc/php/7.0/fpm/php.ini && \
@@ -61,8 +68,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Define working directory.
 WORKDIR /var/www/html
 
+ADD conf/supervisord.conf /etc/supervisord.conf
+
 # Configure default site
-ADD conf/nginx/default /etc/nginx/sites-available/default
+ADD conf/nginx-site.conf /etc/nginx/sites-available/default
 RUN echo "<?php phpinfo() ?>" > /var/www/html/public/index.php
 
 # Configure Xdebug
@@ -77,5 +86,5 @@ RUN \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Define default command.
-CMD service php7.0-fpm start && nginx
+# Define default entry point
+ENTRYPOINT /usr/bin/supervisord -n -c /etc/supervisord.conf
