@@ -19,7 +19,7 @@ Em seguida configure 1 docker para cada projeto que deseja utilizar:
 ```bash
 docker run -p 8000:80 \
     --link mysql:mysql \
-    -v $HOME/Projects/Laravel:/var/www/html \
+    -v $HOME/Projects/Laravel:/var/www/localhost/htdocs \
     -v $HOME/Projects/Laravel/storage/logs:/var/log/nginx \
     --name laravel \
     -d adrianoluis/laravel
