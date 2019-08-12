@@ -26,6 +26,7 @@ RUN \
                      php7-fileinfo \
                      php7-fpm \
                      php7-gd \
+                     php7-iconv \
                      php7-intl \
                      php7-json \
                      php7-mbstring \
@@ -37,12 +38,15 @@ RUN \
                      php7-phar \
                      php7-pgsql \
                      php7-redis \
+                     php7-simplexml \
                      php7-soap \
                      php7-sqlite3 \
                      php7-xdebug \
                      php7-xml \
                      php7-tokenizer \
+                     php7-xmlreader \
                      php7-xmlwriter \
+                     php7-zip \
                      php7-zlib && \
   sed -i "s/listen.owner\s*=\s*nobody/listen.owner = root/" /etc/php7/php-fpm.d/www.conf && \
   sed -i "s/listen.group\s*=\s*nobody/listen.group = root/" /etc/php7/php-fpm.d/www.conf && \
