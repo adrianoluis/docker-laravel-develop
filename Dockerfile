@@ -1,5 +1,5 @@
 # Pull base image.
-FROM alpine:3.9
+FROM alpine:3.10
 
 # Author info
 LABEL Author="Adriano Luís Rocha <driflash@gmail.com>"
@@ -50,10 +50,10 @@ RUN \
                      php7-zlib && \
   sed -i "s/listen.owner\s*=\s*nobody/listen.owner = root/" /etc/php7/php-fpm.d/www.conf && \
   sed -i "s/listen.group\s*=\s*nobody/listen.group = root/" /etc/php7/php-fpm.d/www.conf && \
-  sed -i "s/listen\s*=\s*127\.0\.0\.1\:9000/listen = \/run\/php7\.2\-fpm\.sock/" /etc/php7/php-fpm.d/www.conf && \
+  sed -i "s/listen\s*=\s*127\.0\.0\.1\:9000/listen = \/run\/php7\.3\-fpm\.sock/" /etc/php7/php-fpm.d/www.conf && \
   sed -i "s/user\s*=\s*nobody/user = root/" /etc/php7/php-fpm.d/www.conf && \
   sed -i "s/group\s*=\s*nobody/group = root/" /etc/php7/php-fpm.d/www.conf && \
-  sed -i "s/pid\s*=\s*\/run\/php\/php7\.1\-fpm\.pid/pid = \/run\/php7\.2\-fpm\.pid/" /etc/php7/php-fpm.conf && \
+  sed -i "s/pid\s*=\s*\/run\/php\/php7\.1\-fpm\.pid/pid = \/run\/php7\.3\-fpm\.pid/" /etc/php7/php-fpm.conf && \
   sed -i "s/;daemonize\s*=\s*yes/daemonize = no/" /etc/php7/php-fpm.conf && \
   sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo = 0/" /etc/php7/php.ini && \
   sed -i "s/memory_limit\s*=\s*128M/memory_limit = 256M/" /etc/php7/php.ini && \
