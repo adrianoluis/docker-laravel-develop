@@ -1,5 +1,5 @@
 # Pull base image.
-FROM alpine:3.11
+FROM alpine:3.12
 
 # Author info
 LABEL Author="Adriano Luís Rocha <driflash@gmail.com>"
