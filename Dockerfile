@@ -19,7 +19,10 @@ RUN \
 
 # Install php
 RUN \
-  apk --no-cache add php7 \
+  apk --no-cache add gcc \
+                     musl-dev \
+                     make \
+                     php7 \
                      php7-ctype \
                      php7-curl \
                      php7-dom \
@@ -31,6 +34,7 @@ RUN \
                      php7-json \
                      php7-mbstring \
                      php7-mcrypt \
+                     php7-pear \
                      php7-pdo \
                      php7-pdo_mysql \
                      php7-pdo_pgsql \
@@ -65,6 +69,22 @@ RUN \
   sed -i "s/track_errors\s*=\s*Off/track_errors = On/" /etc/php7/php.ini && \
   sed -i "s/session.gc_probability\s*=\s*0/session.gc_probability = 1/" /etc/php7/php.ini
 
+# Install MSSQL driver
+RUN \
+  curl -O -L https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.5.2.2-1_amd64.apk && \
+  curl -O -L https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.5.2.1-1_amd64.apk && \
+  apk add --allow-untrusted msodbcsql17_17.5.2.2-1_amd64.apk && \
+  apk add --allow-untrusted mssql-tools_17.5.2.1-1_amd64.apk && \
+  apk add --no-cache --virtual .phpize-deps autoconf file g++ make pkgconf re2c php7-dev unixodbc-dev libmcrypt-dev && \
+  pecl install pdo_sqlsrv && \
+  pecl install sqlsrv && \
+  echo extension=pdo_sqlsrv.so > /etc/php7/conf.d/02-pdo_sqlsrv.ini && \
+  echo extension=sqlsrv.so > /etc/php7/conf.d/01-sqlsrv.ini && \
+  export LC_ALL=C && \
+  apk del .phpize-deps && \
+  rm msodbcsql17_17.5.2.2-1_amd64.apk && \
+  rm mssql-tools_17.5.2.1-1_amd64.apk
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -78,7 +98,8 @@ ADD conf/nginx-site.conf /etc/nginx/conf.d/default.conf
 RUN echo "<?php phpinfo() ?>" > /var/www/localhost/htdocs/public/index.php
 
 # Configure Xdebug
-RUN sed -i "s/;zend_extension=xdebug.so/zend_extension=xdebug.so/" /etc/php7/conf.d/xdebug.ini && \
+RUN \
+  sed -i "s/;zend_extension=xdebug.so/zend_extension=xdebug.so/" /etc/php7/conf.d/xdebug.ini && \
   echo "xdebug.remote_enable=on" >> /etc/php7/conf.d/xdebug.ini && \
   echo "xdebug.remote_connect_back=on" >> /etc/php7/conf.d/xdebug.ini
 
