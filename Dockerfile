@@ -34,6 +34,7 @@ RUN \
                      php7-json \
                      php7-mbstring \
                      php7-mcrypt \
+                     php7-mysqli \
                      php7-pear \
                      php7-pdo \
                      php7-pdo_mysql \
