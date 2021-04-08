@@ -1,5 +1,5 @@
 # Pull base image.
-FROM alpine:3.12
+FROM amd64/alpine:3.13
 
 # Author info
 LABEL Author="Adriano Luís Rocha <driflash@gmail.com>"
@@ -54,10 +54,10 @@ RUN \
                      php7-zlib && \
   sed -i "s/listen.owner\s*=\s*nobody/listen.owner = root/" /etc/php7/php-fpm.d/www.conf && \
   sed -i "s/listen.group\s*=\s*nobody/listen.group = root/" /etc/php7/php-fpm.d/www.conf && \
-  sed -i "s/listen\s*=\s*127\.0\.0\.1\:9000/listen = \/run\/php7\.3\-fpm\.sock/" /etc/php7/php-fpm.d/www.conf && \
+  sed -i "s/listen\s*=\s*127\.0\.0\.1\:9000/listen = \/run\/php7\.4\-fpm\.sock/" /etc/php7/php-fpm.d/www.conf && \
   sed -i "s/user\s*=\s*nobody/user = root/" /etc/php7/php-fpm.d/www.conf && \
   sed -i "s/group\s*=\s*nobody/group = root/" /etc/php7/php-fpm.d/www.conf && \
-  sed -i "s/pid\s*=\s*\/run\/php\/php7\.1\-fpm\.pid/pid = \/run\/php7\.3\-fpm\.pid/" /etc/php7/php-fpm.conf && \
+  sed -i "s/pid\s*=\s*\/run\/php\/php7\.1\-fpm\.pid/pid = \/run\/php7\.4\-fpm\.pid/" /etc/php7/php-fpm.conf && \
   sed -i "s/;daemonize\s*=\s*yes/daemonize = no/" /etc/php7/php-fpm.conf && \
   sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo = 0/" /etc/php7/php.ini && \
   sed -i "s/memory_limit\s*=\s*128M/memory_limit = 256M/" /etc/php7/php.ini && \
@@ -70,20 +70,17 @@ RUN \
   sed -i "s/session.gc_probability\s*=\s*0/session.gc_probability = 1/" /etc/php7/php.ini
 
 # Install MSSQL driver
-RUN \
-  curl -O -L https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.5.2.2-1_amd64.apk && \
-  curl -O -L https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.5.2.1-1_amd64.apk && \
-  apk add --allow-untrusted msodbcsql17_17.5.2.2-1_amd64.apk && \
-  apk add --allow-untrusted mssql-tools_17.5.2.1-1_amd64.apk && \
-  apk add --no-cache --virtual .phpize-deps autoconf file g++ make pkgconf re2c php7-dev unixodbc-dev libmcrypt-dev && \
-  pecl install pdo_sqlsrv && \
-  pecl install sqlsrv && \
-  echo extension=pdo_sqlsrv.so > /etc/php7/conf.d/02-pdo_sqlsrv.ini && \
-  echo extension=sqlsrv.so > /etc/php7/conf.d/01-sqlsrv.ini && \
-  export LC_ALL=C && \
-  apk del .phpize-deps && \
-  rm msodbcsql17_17.5.2.2-1_amd64.apk && \
-  rm mssql-tools_17.5.2.1-1_amd64.apk
+RUN cd /tmp && \
+  curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.7.2.1-1_amd64.apk && \
+  curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.7.1.1-1_amd64.apk && \
+  apk add --allow-untrusted msodbcsql17_17.7.2.1-1_amd64.apk && \
+  apk add --allow-untrusted mssql-tools_17.7.1.1-1_amd64.apk && \
+  curl -L https://github.com/microsoft/msphpsql/releases/download/v5.9.0/Alpine312-7.4.tar | tar xv && \
+  cp /tmp/Alpine312-7.4/php_pdo_sqlsrv_74_nts.so /usr/lib/php7/modules/pdo_sqlsrv.so && \
+  cp /tmp/Alpine312-7.4/php_sqlsrv_74_nts.so /usr/lib/php7/modules/sqlsrv.so && \
+  rm -r /tmp/* && \
+  echo extension=pdo_sqlsrv.so > /etc/php7/conf.d/01_pdo_sqlsrv.ini && \
+  echo extension=sqlsrv.so > /etc/php7/conf.d/00_sqlsrv.ini
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -99,9 +96,9 @@ RUN echo "<?php phpinfo() ?>" > /var/www/localhost/htdocs/public/index.php
 
 # Configure Xdebug
 RUN \
-  sed -i "s/;zend_extension=xdebug.so/zend_extension=xdebug.so/" /etc/php7/conf.d/xdebug.ini && \
-  echo "xdebug.remote_enable=on" >> /etc/php7/conf.d/xdebug.ini && \
-  echo "xdebug.remote_connect_back=on" >> /etc/php7/conf.d/xdebug.ini
+  sed -i "s/;zend_extension=xdebug.so/zend_extension=xdebug.so/" /etc/php7/conf.d/50_xdebug.ini && \
+  sed -i "s/;xdebug.mode=off/xdebug.mode=debug/" /etc/php7/conf.d/50_xdebug.ini && \
+  echo "xdebug.discover_client_host=true" >> /etc/php7/conf.d/50_xdebug.ini
 
 # Expose ports.
 EXPOSE 80
